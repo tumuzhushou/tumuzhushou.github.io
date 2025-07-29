@@ -1,91 +1,70 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Website</title>
-    <!-- Web App Manifest -->
-    <link rel="manifest" href="/manifest.webmanifest">
-    <!-- Favicon -->
-    <link rel="icon" href="/favicon.ico" type="image/x-icon">
-    <!-- Apple Touch Icon for iOS devices -->
-    <link rel="apple-touch-icon" sizes="192x192" href="/icons/apple-touch-icon.png">
-    <!-- Theme Color -->
-    <meta name="theme-color" content="#4285f4">
+    <title>主页</title>
     <style>
         body {
             font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .navbar {
+            background-color: #333;
+            overflow: hidden;
+            width: 200px;
+            min-height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+        }
+        .navbar a {
+            display: block;
+            color: white;
             text-align: center;
+            padding: 14px 20px;
+            text-decoration: none;
+        }
+        .navbar a:hover {
+            background-color: #ddd;
+            color: black;
+        }
+        .content {
+            padding: 20px;
+            margin-left: 220px; /* 确保内容不会被固定导航栏遮挡 */
+        }
+        .image-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
             margin-top: 50px;
+        }
+        img {
+            max-width: 75%;
+            height: auto;
         }
     </style>
 </head>
 <body>
-    <h1>Welcome to My Website</h1>
-    <p>This is a sample website that can be added to your home screen.</p>
 
-    <script>
-        // Check if the browser supports service workers and push notifications.
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/service-worker.js')
-                    .then(registration => {
-                        console.log('Service Worker registered with scope:', registration.scope);
-                    })
-                    .catch(error => {
-                        console.error('Service Worker registration failed:', error);
-                    });
-            });
-        }
+<div class="navbar">
+    <a href="index.html">首页</a>	
+    <a href="zuhetable_page.html">模板支架施工荷载组合计算小程序</a>
+	<a href="jubushouya_page.html">支架立柱下混凝土构件局部受压承载力计算</a>
+	<a href="about.html">关于作者</a>
+    <!-- 可以添加更多导航项 -->
+</div>
 
-        // Event listener for beforeinstallprompt event
-        let deferredPrompt;
+<div class="content">
+    <h1>欢迎来到施工员助手主页</h1>
+    <p>施工员助手是为现场施工员提供的便携式小程序，可用于施工荷载计算、荷载组合计算、混凝土局部受压计算等方面。</p>
+    <!-- 插入本地图片 -->
+    <div class="image-container">
+        <img src="img/zhuanti-2021.jpg" alt="桥梁转体施工模拟">
+    </div>
+</div>
 
-        window.addEventListener('beforeinstallprompt', (e) => {
-            // Prevent Chrome 67 and later from automatically showing the prompt
-            e.preventDefault();
-            // Stash the event so it can be triggered later.
-            deferredPrompt = e;
-            // Update UI notify the user they can add to home screen
-            showInstallPromotion();
-        });
-
-        function showInstallPromotion() {
-            const installButton = document.createElement('button');
-            installButton.textContent = 'Add to Home Screen';
-            installButton.style.position = 'fixed';
-            installButton.style.bottom = '30px';
-            installButton.style.right = '30px';
-            installButton.style.padding = '10px 20px';
-            installButton.style.backgroundColor = '#4CAF50';
-            installButton.style.color = 'white';
-            installButton.style.border = 'none';
-            installButton.style.borderRadius = '5px';
-            installButton.style.cursor = 'pointer';
-
-            installButton.addEventListener('click', async () => {
-                // Hide our user interface that shows our A2HS button
-                hideInstallPromotion();
-                // Show the prompt
-                deferredPrompt.prompt();
-                // Wait for the user to respond to the prompt
-                const { outcome } = await deferredPrompt.userChoice;
-                // We've used the prompt, and can't use it again, throw it away
-                deferredPrompt = null;
-                // Optionally, send analytics event with outcome of user choice
-                console.log(`User response to the install prompt: ${outcome}`);
-            });
-
-            document.body.appendChild(installButton);
-        }
-
-        function hideInstallPromotion() {
-            const installButton = document.querySelector('button[textContent="Add to Home Screen"]');
-            if (installButton) {
-                installButton.remove();
-            }
-        }
-    </script>
 </body>
 </html>
 

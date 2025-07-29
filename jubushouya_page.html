@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>混凝土构件局部受压承载力计算</title>	
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        nav {
+            background-color: #0056b3;
+            overflow: hidden;
+        }
+        nav a {
+            float: left;
+            display: block;
+            color: white;
+            text-align: center;
+            padding: 14px 16px;
+            text-decoration: none;
+        }
+        nav a:hover {
+            background-color: #ddd;
+            color: black;
+        }		
+        .container {
+            display: flex;
+            max-width: 1200px;
+            width: 100%;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .left-section {
+            flex: 1;
+            padding: 20px;
+            border-right: 1px solid #ddd;
+        }
+        .right-section {
+            flex: 1;
+            padding: 20px;
+        }
+        h1 {
+            text-align: left;
+            color: #333;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+        }
+        input[type="number"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        select {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #e9f7ef;
+            border: 1px solid #d4edda;
+            border-radius: 4px;
+            color: #155724;
+            font-weight: bold;
+        }
+        .description {
+            line-height: 1.6;
+            color: #555;
+        }
+    </style>
+	<!-- 引入 MathJax -->
+	<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+	<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+<div class="container">
+    <div class="left-section">
+		<div class="navbar">
+		    <a href="index.html">首页</a>
+			<a href="zuhetable_page.html">模板支架施工荷载组合计算小程序</a>
+			<a href="jubushouya_page.html">支架立柱下混凝土构件局部受压承载力计算</a>
+		    <a href="about.html">关于作者</a>
+		    <!-- 可以添加更多导航项 -->
+		</div>
+        <h1>说明</h1>
+        <div class="description">
+			<h3>计算依据</h3>
+			<h4>规范【1】：《混凝土结构设计规范》GB50010-2010</h4>
+			<h3>使用范围</h3>
+			<h4>当模板支架立柱支撑在混凝土构件上时，需要对混凝土构件作局部受压承载力验算。</h4>
+			<h3>其他说明</h3>
+			<h4>1、一般模板支架立柱底部均设置方形钢垫板，混凝土局部受压面积可用垫板的长度、宽度尺寸。</h4>
+			<h4>2、混凝土局部受压净面积，一般取立柱底部垫板面积；后张构件为垫板面积减去孔道或凹槽面积后的净面积。</h4>
+			<h4>3、模板支架立柱在混凝土构件上的位置，包括角部、边中部、中部三种情况。</h4>
+		    <p>计算公式如下：</p>
+            <ul>
+                <li><strong>β<sub>l</sub>计算:</strong> β<sub>l</sub> = sqrt{A<sub>b</sub>/A<sub>l</sub>)</li>
+                <li><strong>F<sub>l</sub>计算:</strong> F<sub>l</sub> = 1.35*β<sub>c</sub>β<sub>l</sub>*f<sub>c</sub>*A<sub>ln</sub></li>                
+            </ul>
+        </div>
+    </div>
+    <div class="right-section">
+		<h1>混凝土构件局部受压承载力计算</h1>
+		<form id="calculator-form">
+			<label for="fc">混凝土轴心抗压强度设计值 (f<sub>c</sub>, MPa):</label>
+			<input type="number" id="fc" required step="any">
+			
+			<label for="βc">混凝土强度影响系数 (βc),当混凝土强度等级不超过C50时，取1.0；C80时取0.8；在两者之间时取内插值:</label>
+			<input type="number" id="xishu1" required step="any">
+			
+			<label for="Al">混凝土局部受压面积 (A<sub>l</sub>，mm<sup>2</sup>):</label>
+			<input type="number" id="areaAl" required step="any">	
+			
+			<label for="a">支撑架立柱截面长度 (a, mm):</label>
+			<input type="number" id="zhizhu_a" required step="any">
+
+			<label for="b">支撑架立柱截面宽度 (b, mm):</label>
+			<input type="number" id="zhizhu_b" required step="any">		
+			
+			<label for="Aln">混凝土局部受压净面积 (A<sub>ln</sub>，mm<sup>2</sup>):</label>
+			<input type="number" id="areaAln" required step="any">
+			
+			<label for="option">选择受压区位置:</label>
+			<select id="option">
+				<option value="standard">位于中部</option>
+				<option value="method1">位于边中</option>
+				<option value="method2">位于角部</option>
+			</select>
+			<!--
+			<label for="Ab">混凝土局部受压的计算底面积 (A<sub>b</sub>，mm<sup>2</sup>):</label>
+			<input type="number" id="areaAb" required step="any">		
+			-->
+			<button type="submit">计算</button>
+		</form>
+		<div id="result_Ab" class="result" style="display: none;">
+			混凝土局部受压的计算底面积 (A<sub>b</sub>): <span id="Ab-result"></span> m<sup>2</sup>
+		</div>
+		<div id="result_Fl" class="result" style="display: none;">
+			混凝土局部受压承载力允许值 (F<sub>l</sub>): <span id="Fl-result"></span> kN
+		</div>
+    </div>
+</div>
+
+<script>
+	document.getElementById('calculator-form').addEventListener('submit', function(event) {
+	    event.preventDefault();
+	
+	    // 获取输入值
+	    const fc = parseFloat(document.getElementById('fc').value);
+		const xishu1 = parseFloat(document.getElementById('xishu1').value);
+		const areaAl = parseFloat(document.getElementById('areaAl').value);
+		const zhizhu_a = parseFloat(document.getElementById('zhizhu_a').value);
+	    const zhizhu_b = parseFloat(document.getElementById('zhizhu_b').value);	
+		const areaAln = parseFloat(document.getElementById('areaAln').value);		
+	
+	    const option = document.getElementById('option').value;
+	
+	    // 检查输入是否有效
+	    if (isNaN(fc) || isNaN(xishu1) || isNaN(areaAl) || isNaN(zhizhu_a) || isNaN(zhizhu_b) || isNaN(areaAln)) {
+	        alert('请输入有效的数值');
+	        return;
+	    }
+		let Ab;
+	    let Fl;
+	
+	    // 根据选择的选项进行不同的计算
+	    switch (option) {
+	        case 'standard':
+				Ab=3*zhizhu_b*(2*zhizhu_b+zhizhu_a)
+	            Fl = (1.35 * xishu1*Math.sqrt(Ab/areaAl)*fc*areaAln);
+	            break;
+	        case 'method1':
+				Ab=3*zhizhu_b*zhizhu_a
+	            Fl = (1.35 * xishu1*Math.sqrt(Ab/areaAl)*fc*areaAln);
+	            break;
+	        case 'method2':
+				Ab=zhizhu_b*zhizhu_a
+	            Fl = (1.35 * xishu1*Math.sqrt(Ab/areaAl)*fc*areaAln);
+	            break;
+	        default:
+	            alert('请选择有效的布置位置');
+	            return;
+	    }
+		Ab=Ab/1000000.0
+		Fl=Fl/1000.0
+	    // 显示结果
+	    document.getElementById('Ab-result').textContent = Ab.toFixed(2);    
+		document.getElementById('Fl-result').textContent = Fl.toFixed(2);
+		document.getElementById('result_Ab').style.display = 'block';
+		document.getElementById('result_Fl').style.display = 'block';
+	});
+</script>
+</body>
+</html>
+
+
