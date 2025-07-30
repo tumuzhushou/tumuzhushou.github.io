@@ -1,6 +1,6 @@
 {
-    "name": "My Website",
-    "short_name": "MySite",
+    "name": "土木施工员助手",
+    "short_name": "土木助手",
     "start_url": "/",
     "display": "standalone",
     "background_color": "#ffffff",
