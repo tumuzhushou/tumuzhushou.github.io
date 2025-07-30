@@ -4,6 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>主页</title>
+    <!-- Web App Manifest -->
+    <link rel="manifest" href="/manifest.webmanifest">
+    <!-- Favicon -->
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <!-- Apple Touch Icon for iOS devices -->
+    <link rel="apple-touch-icon" sizes="192x192" href="/icons/apple-touch-icon.png">
+    <!-- Theme Color -->
+    <meta name="theme-color" content="#4285f4">	
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -64,7 +72,68 @@
         <img src="img/zhuanti-2021.jpg" alt="桥梁转体施工模拟">
     </div>
 </div>
+<script>
+        // Check if the browser supports service workers and push notifications.
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(registration => {
+                        console.log('Service Worker registered with scope:', registration.scope);
+                    })
+                    .catch(error => {
+                        console.error('Service Worker registration failed:', error);
+                    });
+            });
+        }
 
+        // Event listener for beforeinstallprompt event
+        let deferredPrompt;
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Prevent Chrome 67 and later from automatically showing the prompt
+            e.preventDefault();
+            // Stash the event so it can be triggered later.
+            deferredPrompt = e;
+            // Update UI notify the user they can add to home screen
+            showInstallPromotion();
+        });
+
+        function showInstallPromotion() {
+            const installButton = document.createElement('button');
+            installButton.textContent = 'Add to Home Screen';
+            installButton.style.position = 'fixed';
+            installButton.style.bottom = '30px';
+            installButton.style.right = '30px';
+            installButton.style.padding = '10px 20px';
+            installButton.style.backgroundColor = '#4CAF50';
+            installButton.style.color = 'white';
+            installButton.style.border = 'none';
+            installButton.style.borderRadius = '5px';
+            installButton.style.cursor = 'pointer';
+
+            installButton.addEventListener('click', async () => {
+                // Hide our user interface that shows our A2HS button
+                hideInstallPromotion();
+                // Show the prompt
+                deferredPrompt.prompt();
+                // Wait for the user to respond to the prompt
+                const { outcome } = await deferredPrompt.userChoice;
+                // We've used the prompt, and can't use it again, throw it away
+                deferredPrompt = null;
+                // Optionally, send analytics event with outcome of user choice
+                console.log(`User response to the install prompt: ${outcome}`);
+            });
+
+            document.body.appendChild(installButton);
+        }
+
+        function hideInstallPromotion() {
+            const installButton = document.querySelector('button[textContent="Add to Home Screen"]');
+            if (installButton) {
+                installButton.remove();
+            }
+        }
+    </script>
 </body>
 </html>
 
