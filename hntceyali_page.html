@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>混凝土构件局部受压承载力计算</title>
+	<link rel="stylesheet" href="./css/first_styles.css">
+	<!-- 引入 MathJax -->
+	<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+	<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+</head>
+<body>
+	<div class="top-section">
+		<a href="index.html">首页</a>
+		<a href="zuhetable_page.html">模板支架施工荷载组合计算小程序</a>
+		<a href="jubushouya_page.html">支架立柱下混凝土构件局部受压承载力计算</a>
+		<a href="about.html">关于作者</a>
+		<!-- 可以添加更多导航项 -->
+	</div>
+	<div class="container">		
+		<div class="left-section">
+			<h1>说明</h1>
+			<div class="description">
+				<h3>计算依据</h3>
+				<h4>规范【1】：混凝土结构工程施工规范 GB 50666-2011 </h4>
+				<h3>使用范围</h3>
+				<h4>新浇筑混凝土侧压力是墩柱、梁体等模板设计时主要考虑的荷载。</h4>
+				<h4>适用于采用插入式振捣器浇筑工况下混凝土侧压力计算。</h4>
+				<h3>其他说明</h3>
+				<h4>1、新浇筑混凝土侧压力计算公式在相关规范中表述有所不同。</h4>
+				<h4>2、本规范中对混凝土坍落度条件描述是连续的。</h4>
+				<h4>3、施工中需严格控制浇筑时坍落度值、浇筑速度。</h4>
+				<p>计算相关公式及符号说明：</p>
+				<ul>                
+					<li><strong>F计算式1:</strong> \(F=γ_{c}H\)</li>                
+					<li><strong>F计算式2:</strong> \(F=0.28γ_{c}t_{0}βV^{\frac{1}{2}}\)</li>
+					<li><strong>t<sub>0</sub>计算：</strong>\(t_{0}=\frac{200}{T+15}\)</li>
+					<li><strong>h计算：</strong>\(h=\frac{F}{γ_{c}}\)</li>					
+				</ul>
+				<h3>不同坍落度(Tld)对应β取值：</h3>
+				  <ul>
+				    <li>50 < Tld ≤ 90mm 取 0.85；</li>
+				    <li>90 < Tld ≤ 130mm 取 0.9；</li>
+				    <li>130 < Tld ≤ 180mm 取 1.0。</li>
+				  </ul>				
+			</div>
+		</div>
+		<div class="middle-section">
+			<h1>新浇筑混凝土侧压力计算</h1>
+			<form id="calculator-form">
+				<label for="gammac">混凝土的重力密度 (γ<sub>c</sub>, kN/m<sup>3</sup>):</label>
+				<input type="number" id="gammac" required step="any">
+				
+				<label for="t0">新浇筑混凝土的初凝时间(t<sub>0</sub>,h):</label>
+				<input type="number" id="t0" required step="any">
+				
+				<label for="tanluod">混凝土入模时坍落度 (T<sub>ld</sub>，mm):</label>
+				<input type="number" id="tanluodu" required step="any">
+				
+				<label for="wendu">混凝土入模时温度 (T<sub>wd</sub>，℃):</label>
+				<input type="number" id="wendu" required step="any">				
+				
+				<label for="beta">混凝土坍落度影响修正系数 (β):</label>
+				<input type="number" id="beta" required step="any">	
+				
+				<label for="suduv">混凝土浇筑速度 (V, m/h):</label>
+				<input type="number" id="jiaozhu_v" required step="any">
+
+				<label for="gaoduh">混凝土侧压力计算位置处至新浇筑混凝土顶面的总高度 (H, m):</label>
+				<input type="number" id="jiaozhu_h" required step="any">
+				
+				<button type="submit">计算</button>
+			</form>
+		</div>
+		<div class="right-section">
+			<div class="img-section">
+				<img src="./img/h有效压头高度.png" alt="有效压头高度示意图">
+			</div>
+			<div id="result_F1" class="result" style="display: none;">
+				按公式1计算 (F<sub>k</sub>): <span id="F1-result"></span> kN/m<sup>2</sup>
+			</div>
+			<div id="result_F2" class="result" style="display: none;">
+				取公式1和2中较小值 (F<sub>k</sub>): <span id="F2-result"></span> kN/m<sup>2</sup>
+			</div>
+			<div id="result_h" class="result" style="display: none;">
+				有效压头高度 (h): <span id="h-result"></span> m
+			</div>
+			
+		</div>		
+	</div>
+
+<script>
+	document.getElementById('calculator-form').addEventListener('submit', function(event) {
+	    event.preventDefault();
+	
+	    // 获取输入值
+	    const gammac = parseFloat(document.getElementById('gammac').value);
+		const t0 = parseFloat(document.getElementById('t0').value);
+		const tanluodu = parseFloat(document.getElementById('tanluodu').value);	
+		const wendu = parseFloat(document.getElementById('wendu').value);
+		const beta = parseFloat(document.getElementById('beta').value);
+		const jiaozhu_v = parseFloat(document.getElementById('jiaozhu_v').value);
+	    const jiaozhu_h = parseFloat(document.getElementById('jiaozhu_h').value);	   
+	
+	    // 检查输入是否有效
+	    if (isNaN(gammac) || isNaN(t0) || isNaN(tanluodu) || isNaN(wendu) || isNaN(beta) || isNaN(jiaozhu_v) || isNaN(jiaozhu_h)) {
+	        alert('请输入有效的数值');
+	        return;
+	    }
+		let F1;
+	    let F2;
+		let Fk;	
+	    // 根据坍落度、浇筑速度判断计算公式
+		if (tanluodu > 180 || jiaozhu_v > 10 ){
+			Fk=gammac*jiaozhu_h;
+			document.getElementById('F1-result').textContent = Fk.toFixed(3);
+			document.getElementById('result_F1').style.display = 'block';
+			document.getElementById('result_F2').style.display = 'none';
+		} else {
+			F2=0.28*gammac*t0*beta*Math.sqrt(jiaozhu_v);
+			F1=gammac*jiaozhu_h;
+			Fk=Math.min(F1,F2);
+			document.getElementById('result_F1').style.display = 'none';
+			document.getElementById('F2-result').textContent = Fk.toFixed(3);
+			document.getElementById('result_F2').style.display = 'block';
+		}
+		  h=Fk/gammac
+		  document.getElementById('h-result').textContent = h.toFixed(3);
+		  document.getElementById('result_h').style.display = 'block';
+			
+	});
+</script>
+</body>
+</html>
+
+
