@@ -1,6 +1,7 @@
-body {
+body,html {
 	font-family: Arial, sans-serif;
 	margin: 20px;
+	background-color: lightblue;
 }
 nav {
 	background-color: #0056b3;
@@ -18,6 +19,19 @@ nav a:hover {
 	background-color: #ddd;
 	color: black;
 }		
+.header, .footer {
+	background-color: lightblue;
+	color: white;
+	text-align: left;
+	padding: 20px 0;
+}
+.contan_second {	
+	padding: 20px;
+	background-color: lightgrey;
+	border-right: 1px solid #ddd;
+}
+
+
 table {
 	width: 100%;
 	border-collapse: collapse;
@@ -37,7 +51,7 @@ input[type="number"] {
 }
 button {
 	padding: 10px 20px;
-	background-color: #4CAF50;
+	background-color: #0056b3;
 	color: white;
 	border: none;
 	cursor: pointer;
