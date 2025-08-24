@@ -9,11 +9,14 @@
 </head>
 <body>
 	<div class="navbar">
-	    <a href="index.html">首页</a>	    
-		<a href="jubushouya_page.html">支架立柱下混凝土构件局部受压承载力计算</a>
-		<a href="hntceyali_page.html">新浇筑混凝土侧压力计算</a>
-		<a href="about.html">关于作者</a>		
-	    <!-- 可以添加更多导航项 -->
+		<nav>
+			<a href="index.html">首页</a>	    
+			<a href="jubushouya_page.html">支架立柱下混凝土构件局部受压承载力计算</a>
+			<a href="hntceyali_page.html">新浇筑混凝土侧压力计算</a>
+			<a href="fenghezai_page.html">模板支架风荷载计算</a>
+			<a href="about.html">关于作者</a>		
+			<!-- 可以添加更多导航项 -->
+	    </nav>
 	</div>
     <header> 		
 		<h2>荷载组合交互式计算</h2>
@@ -24,6 +27,7 @@
 		<hr />
 		<h3>荷载数据</h3>
     </header>
+	<div class = "contan_second">
 	<!--计算表格-->
 	<table id="calcTable">
 		<thead>
@@ -150,9 +154,14 @@
 	        </tr>
 	    </tbody>
 	</table>
-	<!--功能-->		
-	<button onclick="saveData()">保存荷载数据</button>	
-	<button onclick="loadData()">读取荷载数据</button>	
+		<!--功能-->		
+		<button onclick="saveData()">保存荷载数据</button>	
+		<button onclick="loadData()">读取荷载数据</button>	
+	</div>
+	
+	<div class="footer">
+		
+	</div>
 	<script>
 		function calculateRow(inputElement) {
 			const row = inputElement.parentElement.parentElement;

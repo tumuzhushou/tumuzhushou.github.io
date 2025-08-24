@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>模板支架风荷载计算</title>
+	<link rel="stylesheet" href="./css/first_styles.css">
+	<!-- 引入 MathJax -->
+	<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+	<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+	<div class="header">
+		<nav>
+			<a href="index.html">首页</a>
+			<a href="zuhetable_page.html">模板支架施工荷载组合计算小程序</a>		
+			<a href="jubushouya_page.html">支架立柱下混凝土构件局部受压承载力计算</a>
+			<a href="hntceyali_page.html">新浇筑混凝土侧压力计算</a>				
+			<a href="about.html">关于作者</a>
+			<!-- 可以添加更多导航项 -->
+		</nav>
+	</div>
+	<div class="container">		
+		<div class="left-section">
+			<h1>说明</h1>
+			<div class="description">
+				<h3>计算依据</h3>
+				<h4>规范【1】：《建筑结构荷载规范》GB50009-2012</h4>
+				<h4>规范【2】：《混凝土结构工程施工规范》GB50666-2011</h4>				
+				<h4>规范【3】：《建筑施工临时支撑结构技术规范》JGJ300-2013</h4>
+				<h4>标准【4】：《建筑施工承插型盘扣式钢管脚手架安全技术标准》JGJT231-2021</h4>
+				<h4>规程【5】：《铁路混凝土梁支架法现浇施工技术规程》TB 10110-2011</h4>				
+				<h3>使用范围</h3>
+				<h4>现浇梁、板施工模板支架承受的风荷载计算。</h4>
+				<h3>其他说明</h3>
+				<h4>1、风荷载是模板支架承受的主要水平荷载，尤其在模板支立完成未绑扎钢筋或浇筑混凝土之前。</h4>
+				<h4>2、风荷载大小与模板支架搭设高度关系很大。</h4>
+				<h4>3、模板支架竖向不同部位风荷载体型系数不同，风荷载大小也不同。</h4>
+				<h4>4、规范2规定基本风压ω<sub>0</sub>可取10年一遇风压值，并不得小于0.2kPa。</h4>
+				<p>计算相关公式及符号说明：</p>
+				<ul>                
+					<li><strong>w<sub>k</sub>计算式:</strong> \(w_{k}=β_{z}μ_{s}μ_{z}ω_{0}\)</li>                
+					<li><strong>η<sub>B</sub>计算式：</strong>\(η_{B}=[1+k\tan(a)(1-\frac{z}{2.5H})]^2\)</li>
+					<li><strong>β<sub>z</sub>计算式:</strong> \(β_{z}=1+2gI_{10}B_{z}\sqrt{(1+R^2)}\)</li>					
+					<li><strong>R计算公式：</strong> \(R=\sqrt{(\frac{π}{6ξ_{1}})*\frac{x_{1}^2}{(1+x_{1}^2)^\frac{4}{3}}}\)</li>					
+				</ul>
+			</div>
+		</div>
+		<div class="middle-section">
+			<h2>一、风荷载计算基本参数</h2>
+			<hr />
+			<div class="form-group">
+				<label for="diqu_jibenfy">地区基本风压 (ω<sub>0</sub>,kPa):</label>
+				<input type="number" id="diqu_jibenfy" value = "0.3" required step="any">
+			</div>
+			<div class="form-group">
+				<label for="zhijia_H">结构离地面或海平面高度 (H<sub>0</sub>,m):</label>
+				<input type="number" id="zhijia_H" value = "15.0" required step="any">	
+			</div>
+			<div class="form-group">
+				<label for="zhijia_yfb">结构迎风面宽度 (B<sub>yf</sub>,m):</label>
+				<input type="number" id="zhijia_yfb" value = "20.0" required step="any">				
+			</div>
+				<div class="form-group">
+				<label for="zhijia_cfb">结构侧风面宽度 (B<sub>cf</sub>,m):</label>
+			<input type="number" id="zhijia_cfb" value = "20.0" required step="any">		
+			</div>	
+			<div class="form-group">	
+				<label for="option_jiegouleixing">结构类型:</label>
+				<select id="option_jiegouleixing">
+					<option value="jiegouleixing_A">A:钢结构</option>
+					<option value="jiegouleixing_B">B:钢筋混凝土结构</option>
+				</select>
+			</div
+			<hr />
+			<h2>二、风压高度变化系数计算</h2>
+			<hr />
+			<div class="form-group">
+				<label for="option_changdi">地面粗糙度类别:</label>
+				<select id="option_changdi">
+					<option value="changdi_A">A:位于近海海面和海岛、海岸、湖岸或沙漠地区</option>
+					<option value="changdi_B">B:位于田野、乡村、丛林、丘陵以及房屋比较稀疏的乡镇</option>
+					<option value="changdi_C">C:位于密集建筑群的城市市区</option>
+					<option value="changdi_D">D:位于有密集建筑群且房屋较高的城市市区</option>
+				</select>
+			</div>		
+				<button type="calclate_betaz" onclick="interpolate()">计算基本μ<sub>z</sub></button>				
+						
+			<div id="result_muz" class="result" style="display: none;">
+				风压高度变化系数 (μ<sub>z</sub>): <span id="muz_result"></span>
+			</div>
+			<h3>山区风压高度变化修正系数计算</h3>
+			<div class="img-section">
+				<img src="./img/山区风压高度变化修正系数.png" alt="山区风压高度变化修正计算示意图" width ="100%">
+			</div>
+			<label for="eta_B">山区顶部B处风压高度变化修正系数 (η<sub>B</sub>):</label>
+			<div class="form-group">
+				<label for="eta_B">系数k:山峰取2.2，山坡取1.4：</label>
+				<input type="number" id="xishu_k"  value = "1.4" required step="any">
+			</div>
+			<div class="form-group">
+				<label for="shanfeng_pd">山峰或山坡迎风一侧的坡度，坡度大于0.3时取0.3：</label>
+				<input type="number" id="shanfeng_pd" value = "0.25" required step="any">	
+			</div>
+			<div class="form-group">
+				<label for="shanfeng_gd">山峰或山顶全高(H,m)：</label>
+				<input type="number" id="shanfeng_gd" value = "55.0" required step="any">				
+			</div>
+			<div class="form-group">
+				<label for="jisuan_gd">计算位置离地面高度,z>2.5H时，取z=2.5H(z,m)：</label>
+				<input type="number" id="jisuan_gd" value = "15.0" required step="any">		
+			</div>
+			<div class="form-group">
+				<label for="eta_A">A处修正系数η<sub>A</sub>取值为：</label>
+				<input type="number" id="eta_A" value ="1" readonly>
+			</div>
+			<div class="form-group">
+				<label for="eta_C">C处修正系数η<sub>C</sub>取值为：</label>
+				<input type="number" id="eta_C" value ="1" readonly>
+			</div>
+			<div class="form-group">
+				<label for="pengdi_eta">山间盆地或谷地等闭塞地形，η∈[0.75~0.85]：</label>
+				<input type="number" id="pengdi_eta" value = "0.80" required step="any">		
+			</div>
+			<div class="form-group">
+				<label for="shangukou_eta">风向一致的山口、谷口，η∈[1.2~1.5]：</label>
+				<input type="number" id="shangukou_eta" value ="1.2" required step="any">	
+			</div>
+			
+			<div id="result_etaB" class="result" style="display: none;">
+				山区风压高度变化修正系数 (η<sub>B</sub>): <span id="etaB-result"></span>
+			</div>
+			
+			<button type="calclate_etaB" onclick="calculate_etaB()">计算η<sub>B</sub></button>
+			<h3>远海海面和海岛的风压高度变化系数修正系数</h3>
+			<label for="yuanhai_juli">建筑物或构筑物距海岸的距离（km）：</label>
+			<input type="number" id="yuanhai_juli" value = "50.0" required step="any">	
+			<div id="result_etayh" class="result" style="display: none;">
+				远海海面和海岛的风压高度变化系数修正系数 (η<sub>yh</sub>): <span id="etayh-result"></span>
+			</div>
+			<button type="calclate_etaYH" onclick="calculate_etaYH()">计算η<sub>yh</sub></button>
+			
+			<h2>三、风振系数计算</h2>
+			<h3>顺风向风振系数计算</h3>
+			<label for="result_SFbetaZ">计算顺风向风振系数：</label>			
+			<div id="result_SFbetaZ" class="result" style="display: none;">
+				顺风向风振系数 (β<sub>zsf</sub>): <span id="SFbetaZ-result"></span>
+			</div>
+
+			<button type="calclate_betaZ" onclick="CalcWindowtobetaZ()">计算β<sub>z</sub></button>					
+		</div>
+		
+		<div class="right-section">
+			<h2>四、风荷载体型系数计算</h2>
+			<h3>1、相关规范图表</h3>
+			<div class="image-container">
+			    <img src="./img/单榀桁架体型系数.png" alt="单榀桁架体型系数">
+			    <img src="./img/n榀桁架体型系数.png" alt="n榀桁架体型系数">
+			</div>
+			<h3>2、根据规范3第4.2.5条，可以按照桁架结构型式参照规范1中的图表计算体型系数</h3>
+			<p>注1：模板支架结构形式包括满堂式、梁柱式，此计算统一按桁架计算体型系数</p>
+			<p>注2：梁柱式分下部钢管柱结构和上部型钢梁结构，输入参数针对上部桁架梁部分</p>
+			
+			<h3>3、模板支架结构主要参数</h3>
+
+			<div class="form-group">
+				<label for="zhijia_ligan_kuandu">迎风面立杆直径或宽度：B<sub>lg</sub>(mm)：</label>
+				<input type="number" id="zhijia_ligan_kuandu" value = "60" required step="any">
+			</div>
+			<div class="form-group">
+				<label for="zhijia_ligan_zxjianju">迎风面立杆纵向间距：X<sub>lg</sub>(mm)：</label>
+				<input type="number" id="zhijia_ligan_zxjianju" value = "900" required step="any">	
+			</div>
+			<div class="form-group">	
+				<label for="zhijia_shuiping_kuandu">迎风面水平杆直径或高度：B<sub>spg</sub>(mm)：</label>
+				<input type="number" id="zhijia_shuiping_kuandu" value = "48" required step="any">
+			</div>
+			<div class="form-group">	
+				<label for="zhijia_shuiping_jianju">迎风面水平杆竖向间距：h<sub>spg</sub>(mm)：</label>
+				<input type="number" id="zhijia_shuiping_jianju" value = "1500" required step="any">
+			</div>
+			<div class="form-group">
+			    <label for="zhijia_yingfeng_xiegankuan">迎风面桁架斜杆的直径或宽度:B<sub>xg</sub>(mm)</label>
+			    <input type="number" id="zhijia_yingfeng_xiegankuan" value = "38"  required step="any">
+			</div>
+			<div class="form-group">
+			    <label for="zhijia_yingfeng_xieganchang">迎风面桁架斜杆的长度:l<sub>xg</sub>(mm)</label>
+			    <input type="number" id="zhijia_yingfeng_xieganchang" value = "1750"required step="any">
+			</div>
+			<div class="form-group">
+			    <label for="zhijia_yingfeng_xieganshu">计算挡风面积时最小单元内斜杆的数量:n<sub>xg</sub></label>
+			    <input type="number" id="zhijia_yingfeng_xieganshu" value = "1" required step="any">
+			</div>
+			<div class="form-group">
+			    <label for="zhijia_yingfeng_pinshu">迎风面桁架的榀数:n<sub>hj</sub></label>
+			    <input type="number" id="zhijia_yingfeng_pinshu" value = "10" required step="any">
+			</div>
+			<div class="form-group">
+			    <label for="zhijia_yingfeng_pinjianju">迎风面桁架的榀间距:b<sub>hj</sub>(mm)</label>
+			    <input type="number" id="zhijia_yingfeng_pinjianju" value = "450" required step="any">
+			</div>
+			
+			<h3>4、计算桁架挡风系数</h3>
+			<h4>注3：规范3第4.2.5节第3条指出：密目式安全立网全封闭支撑结构挡风系数不宜小于0.8。基于安全考虑一般取1.0。此支撑结构状况下体型系数直接用1.3即可；
+			例如，梁底至梁面上防护栏杆范围内的支撑结构就可采用此体型系数进行风荷载计算。</h4>
+			<h4>注4：对于非悬挂密目式安全网处的支撑结构可按裸桁架形式计算体型系数。</h4>
+			<div id="result_dangfengxishu" class="result">
+				纯桁架挡风系数-未乘1.2系数且未考虑挂密目式安全网工况- (φ): <span id="dangfengxishu_result"></span>
+			</div>			
+			<div id="result_danpintixingxishu" class="result">
+				单榀桁架体型系数-(μ<sub>st</sub>): <span id="danpintixingxishu_result"></span>
+			</div>			
+			<div id="result_zhengtixishu" class="result">
+				桁架整体体型系数- (μ<sub>stw</sub>): <span id="zhengtixishu_result"></span>
+			</div>			
+			<h3>5、计算桁架的体型系数</h3>						
+			<button type="calclate_danpintixingxishu" onclick="calculate_dangfengxishu()">计算整体桁架的体型系数μ<sub>stw</sub></button>
+			<h2>五、风荷载体型标准值计算</h2>
+			<h3>综合上述各步骤计算结果，计算支撑结构风荷载标准值。</h3>
+			<h4>此结果为支撑结构中非悬挂密目网的桁架部分所承受的风荷载，应用时用桁架面积乘风荷载标准值。</h4>				
+			<h4>支撑结构中的其他杆件，如钢管立柱，其风荷载体型系数另做计算。</h4>
+			
+			<button type="calc_fenghezaibiaozhunzhi" onclick="calc_fenghezaibiaozhunzhi()">计算风荷载标准值w<sub>k</sub></button>
+			
+			<div id="result_fhzbiaozhunzhi" class="result" style="display: none;">
+				桁架结构风荷载标准值 (w<sub>k</sub>): <span id="fhzbiaozhunzhi-result"></span>kN/m<sup>2</sup>
+			</div>			
+
+		</div>		
+	</div>
+    <div class="footer">
+        
+    </div>
+<script>	
+	function calculate_etaB(){
+		// 计算山区风压高度修正系数
+		// 获取输入值
+		const xishu_k = parseFloat(document.getElementById('xishu_k').value);
+		const shanfeng_pd = parseFloat(document.getElementById('shanfeng_pd').value);
+		const shanfeng_gd = parseFloat(document.getElementById('shanfeng_gd').value);
+		const jisuan_gd = parseFloat(document.getElementById('jisuan_gd').value);
+		// 检查输入是否有效
+		if (isNaN(xishu_k) || isNaN(shanfeng_pd) || isNaN(shanfeng_gd) || isNaN(jisuan_gd)) {
+		    alert('请输入有效的数值');
+		    return;
+		}
+		let etaB;
+		etaB=(1+xishu_k*shanfeng_pd*(1-jisuan_gd/(2.5*shanfeng_gd)))**2		
+		document.getElementById('etaB-result').textContent = etaB.toFixed(2);
+		document.getElementById('result_etaB').style.display = 'block';
+	}
+	// 接受子页面数据
+	function receiveResult(result){
+	  document.getElementById('SFbetaZ-result').textContent = result.toFixed(3);
+	  document.getElementById('result_SFbetaZ').style.display = 'block';
+	}
+	
+	document.querySelectorAll('.image-container img').forEach(img => {
+		img.addEventListener('click', function() {
+			if (this.style.transform === 'scale(1.5)') {
+				this.style.transform = 'scale(1)';
+			} else {
+				this.style.transform = 'scale(1.5)';
+			}
+		});
+	});
+	// 计算挡风系数、单榀桁架体型系数及整体桁架体型系数
+	function calculate_dangfengxishu(){
+		// 获取输入值
+		const ligan_kuandu = parseFloat(document.getElementById('zhijia_ligan_kuandu').value);
+		const ligan_zxjianju = parseFloat(document.getElementById('zhijia_ligan_zxjianju').value);
+		const shuiping_jianju = parseFloat(document.getElementById('zhijia_shuiping_jianju').value);
+		const shuiping_kuandu = parseFloat(document.getElementById('zhijia_shuiping_kuandu').value);
+		
+		const xiegankuan = parseFloat(document.getElementById('zhijia_yingfeng_xiegankuan').value);
+		const xieganchang = parseFloat(document.getElementById('zhijia_yingfeng_xieganchang').value);
+		const xieganshu = parseFloat(document.getElementById('zhijia_yingfeng_xieganshu').value);	
+			
+		const pinshu = parseFloat(document.getElementById('zhijia_yingfeng_pinshu').value);
+		const pinjianju = parseFloat(document.getElementById('zhijia_yingfeng_pinjianju').value);
+		
+		// 检查输入是否有效
+		if (isNaN(ligan_kuandu) || isNaN(ligan_zxjianju) || isNaN(shuiping_jianju) || isNaN(shuiping_kuandu) || isNaN(xiegankuan)
+		
+		 || isNaN(xieganchang) || isNaN(xieganshu) || isNaN(pinshu) || isNaN(pinjianju)) {
+		    alert('请输入支架参数有效数值');
+		    return;
+		}
+		// 计算挡风系数
+		let dangfengmianji;
+		let yingfengmianji;
+		let dangfengxishu;
+		yingfengmianji = ligan_zxjianju * shuiping_jianju;
+		dangfengmianji = ligan_kuandu * shuiping_jianju +ligan_zxjianju * shuiping_kuandu + xiegankuan * xieganchang * xieganshu;
+		dangfengxishu = 1.0 * dangfengmianji / yingfengmianji;
+		document.getElementById('dangfengxishu_result').textContent = dangfengxishu.toFixed(3);
+		
+		let ust;
+		let bizhi;
+		let eta;
+		let ustw;
+		ust = 1.3 * dangfengxishu;
+		bizhi = pinjianju / shuiping_jianju;
+		// bilinearInterpolation(x0, y0, x1, y1, z00, z10, z01, z11, x, y)
+		if (bizhi <= 1.0){
+			if (dangfengxishu <= 0.1){
+				eta = 1;
+			} else if(dangfengxishu > 0.1 && dangfengxishu <= 0.2){
+				eta = linearInterpolation(0.1, 1.0, 0.2, 0.85, dangfengxishu);
+			} else if (dangfengxishu > 0.2 && dangfengxishu <= 0.3){
+				eta = linearInterpolation(0.2, 0.85, 0.3, 0.66, dangfengxishu);
+			}else if (dangfengxishu > 0.3 && dangfengxishu <= 0.4){
+				eta = linearInterpolation(0.3, 0.66, 0.4, 0.50, dangfengxishu);
+			}			
+		} else if(bizhi >1.0 && bizhi <= 2.0){
+			if (dangfengxishu <= 0.1){
+				eta = 1;
+			} else if(dangfengxishu > 0.1 && dangfengxishu <= 0.2){
+				eta = bilinearInterpolation(0.1, 1.0, 0.2, 2.0, 1.0, 0.85, 1.0, 0.9, dangfengxishu, bizhi);
+			} else if (dangfengxishu > 0.2 && dangfengxishu <= 0.3){
+				eta = bilinearInterpolation(0.2, 1.0, 0.3, 2.0, 0.85, 0.9, 0.66, 0.75, dangfengxishu, bizhi);
+			}else if (dangfengxishu > 0.3 && dangfengxishu <= 0.4){
+				eta = bilinearInterpolation(0.3, 1.0, 0.4, 2.0, 0.66, 0.75, 0.5, 0.6, dangfengxishu, bizhi);
+			}			
+			
+		}		
+		ustw = ust * (1.0 - eta**pinshu) / (1.0 - eta)
+		document.getElementById('danpintixingxishu_result').textContent = ust.toFixed(3);		
+		document.getElementById('zhengtixishu_result').textContent = ustw.toFixed(3);	
+	}
+	function calc_fenghezaibiaozhunzhi(){
+		//计算风荷载标准值
+		// 获取过程计算值
+		const jibenfy = parseFloat(document.getElementById('diqu_jibenfy').value);
+		const muz_result = parseFloat(document.getElementById('muz_result').innerText);
+		const zhengtixishu = parseFloat(document.getElementById('zhengtixishu_result').innerText);
+		const SFbetaZ = parseFloat(document.getElementById('SFbetaZ-result').innerText);
+		// 检查输入是否有效
+		if (isNaN(jibenfy) || isNaN(muz_result) || isNaN(zhengtixishu) || isNaN(zhengtixishu) || isNaN(SFbetaZ)) {
+		    alert('计算风荷载标准值:获取过程计算值出现错误项');
+		    return;
+		}		
+		
+		let fhz_wk;
+		
+		fhz_wk = SFbetaZ * zhengtixishu * muz_result * jibenfy;
+		
+		document.getElementById('fhzbiaozhunzhi-result').textContent = fhz_wk.toFixed(3);
+		document.getElementById('result_fhzbiaozhunzhi').style.display = 'block';
+		
+	}
+	
+	
+</script>
+	<script src="./js/customfun.js"></script>
+</body>
+</html>
+
+

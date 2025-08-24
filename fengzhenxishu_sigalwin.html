@@ -1,0 +1,384 @@
+<!-- 计算风振系数页面 -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>风振系数计算窗口</title>
+  <!-- 引入 MathJax -->
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script> 
+  <style>
+          body {
+              font-family: Arial, sans-serif;
+              margin: 20px;
+			  padding: 10px;
+			  background-color: lightblue;			  
+          }
+		  .contain_user{
+			  display:flex;			  
+			  margin: 30px;
+			  padding: 30px;
+			  background-color: white;
+			  border-radius: 8px;
+			  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+		  }
+		  .leftsection{
+			  flex:1;
+			  padding: 20px;
+			  border-right: 1px solid #ddd;
+		  }
+		  .rightsection{
+		  	  flex:1;
+		  	  padding: 20px;		  	   
+		  }
+          input{
+              margin: 5px 0;
+              padding: 5px;
+			  width:200px;
+			  height:20px
+          }
+		  button {
+		      margin: 5px 0;
+		      padding: 1px;
+		  	  width:210px;
+		  	  height:35px
+			  
+		  }
+		  select{
+			  margin: 5px 0;
+			  padding: 5px;
+			  height:25px			  
+		  }
+   </style>  
+</head>
+<body>		
+	<div class = "contain_user">
+		<div class = "leftsection">
+		  <h3>一、计算顺风向脉动风荷载的共振分量因子：R</h3>		  
+		  <h4>1、规范标准规定</h4>
+		  <p>（1）、荷载规范规定：对于高度大于30m且高宽比大于1.5的房屋，以及基本自振周期T<sub>1</sub>大于0.25s的各种高耸结构，应考虑风压脉动对结构产生顺风向风振影响。</p>
+		  <p>（2）、荷载规范规定：对于风敏感的或者跨度大于36m的柔性屋盖结构，应考虑风压脉动对结构产生顺风向风振影响。</p>
+		  <p>（3）、荷载规范规定：对于一般竖向悬臂型结构，均可仅考虑结构第一振型影响。</p>
+		  <h4>2、相关参数</h4>
+		  <label for="fzyz_g">峰值因子(g)：</label><br />
+		  <input type="number" id="fzyz_g" value = "2.5" readonly/><br />
+			<label for="option_I10">10m高度名义湍流强度:</label>
+			<select id="option_I10">
+				<option value="0.12">A类场地</option>
+				<option value="0.14">B类场地</option>
+				<option value="0.23">C类场地</option>
+				<option value="0.39">D类场地</option>
+			</select><br />
+		  <h4>3、计算脉动风荷载的共振分量因子</h4>
+		  <p><strong>R计算公式：</strong> \(R=\sqrt{(\frac{π}{6ξ_{1}})*\frac{x_{1}^2}{(1+x_{1}^2)^\frac{4}{3}}}\)</p>
+		  <p><strong>x<sub>1</sub>计算公式：</strong> \(x_{1}=\frac{30f_{1}}{\sqrt{k_{w}w_{0}}}\)</p>		  
+		  <label for="result_zizhenzhouqi">结构第1阶自振周期 T<sub>1</sub>：</label>
+		  <input type="text" id="result_zizhenzhouqi" placeholder="结构基本自振周期" readonly/><br />
+		  <label for="result_zizhenpinlv">结构第1阶自振频率 f<sub>1</sub>：</label>  
+		  <input type="text" id="result_zizhenpinlv" placeholder="结构第1阶自振频率" readonly/><br />
+		  <label for="option_kw">地面粗糙度修正系数（k<sub>w</sub>）:</label>
+		  <select id="option_kw">
+			<option value="1.28">A类场地</option>
+			<option value="1.00">B类场地</option>
+			<option value="0.54">C类场地</option>
+			<option value="0.26">D类场地</option>
+		  </select><br />
+		  <label for="result_xishux1">系数 x<sub>1</sub>：</label>
+		  <input type="text" id="result_xishux1" placeholder="系数-x1" readonly/><br />
+		  
+		  <label for="option_Xi">结构阻尼比（ξ<sub>1</sub>）:</label>
+		  <select id="option_Xi">
+		  			<option value="0.01">钢结构</option>
+		  			<option value="0.02">有填充墙的钢结构房屋</option>
+		  			<option value="0.05">钢筋混凝土及砌体结构</option>		  			
+		  </select><br />		  
+		  <h4>4、计算脉动风荷载的共振分量因子 R</h4>
+		  <button onclick="calculategzflyzR()">计算共振分量因子 R</button><br />
+		  <label for="result_gzflR">脉动风荷载的共振分量因子 R：</label>
+		  <input type="text" id="result_gzflR" placeholder="共振分量因子-R" readonly/><br />
+		  
+		</div>
+		<div class = "rightsection">
+		  <h3>二、计算顺风向脉动风荷载的背景分量因子：Bz</h3>
+		  <h4>1、规范标准规定</h4>
+		  <p>(1)、荷载规范规定：对体型和质量沿高度均匀分布的高层建筑和高耸结构，按8.4.5式计算；</p>
+		  <p>(2)、荷载规范规定：对迎风面和侧风面的宽度沿按直线或近似直线变化，而质量沿高度按连续规律变化的高松结构，按8.4.5式计算后乘以相关修正系数；</p>
+		  <p>(3)、详细规定见荷载规范。</p>
+		  <h4>2、相关参数</h4>
+		  <label for="jiegouzhenxing_1">结构第1阶振型系数 φ<sub>1</sub>(z)：</label>
+		  <input type="number" id="jiegouzhenxing_1" value = "1.0" /><br />
+		  <label for="xiuzhengxishu_xitaB">结构计算高度处迎风侧宽度与底迎风侧宽度比值 θ<sub>B</sub>：</label>
+		  <input type="number" id="xiuzhengxishu_xitaB" value = "1.0" /><br />
+		  <label for="xiuzhengxishu_xitaV">结构计算高度处侧向宽度与底侧向宽度比值 θ<sub>v</sub>：</label>
+		  <input type="number" id="xiuzhengxishu_xitaV" value = "1.0" /><br />
+		  
+		  <h4>3、计算脉动风荷载的背景分量因子：Bz</h4>
+		  <button onclick="calculatebjfl_Bz()">计算背景分量因子：Bz</button><br />
+		  <label for="result_bjfl_Bz">脉动风荷载的背景分量因子 B<sub>z</sub>：</label>
+		  <input type="text" id="result_bjfl_Bz" placeholder="脉动风荷载的背景分量因子" readonly/><br />
+		  
+		  <h3>三、计算顺风向风振系数</h3>
+		  <h4>计算z高度处的风振系数：βz</h4>
+		  <button onclick="calculate_fengzh_betaz()">计算风振系数：βz</button><br />
+		  <label for="result_fengzh_betaz">顺风向风振系数：β<sub>z</sub>：</label>
+		  <input type="text" id="result_fengzh_betaz" placeholder="顺风向风振系数" readonly/><br />				
+
+		  <button onclick="colse_childwin()">返回上一层页面</button>
+		</div>  
+	</div>
+  <script>
+	function calculategzflyzR(){
+		//结构第1阶自振周期
+		//读取模板支架高度
+		if (window.opener && !window.opener.closed) {
+		        // 假设母窗口有一个函数 receiveResult(result)
+		        // window.opener.receiveResult(result);		        
+		        // 或者直接设置母窗口的某个元素值（需母窗口配合）
+		        // 例如：window.opener.document.getElementById('result').innerText = result;		
+		const zhijiaheight = parseFloat(window.opener.document.getElementById('zhijia_H').value);
+		const diqu_jibenfy = parseFloat(window.opener.document.getElementById('diqu_jibenfy').value);
+		// 检查输入是否有效
+		if (isNaN(zhijiaheight) || isNaN(diqu_jibenfy)) {
+		    alert('请输入有效的支架结构高度值或基本风压值');
+		    return;
+		}
+		const option_1 = window.opener.document.getElementById('option_jiegouleixing').value;	  
+		const option_2 = document.getElementById('option_kw').value;	  
+		const option_3 = document.getElementById('option_Xi').value;	
+		// 根据选择的选项进行不同的计算
+		let zhouqi_T1;
+		let pinlu_f1;
+		let xishu_kw;
+		let xishu_x1;
+		let zunibi;
+		let gzflR;
+		//计算自振周期和频率
+		switch (option_1) {
+		    case 'jiegouleixing_A':
+			    zhouqi_T1 = 0.013*zhijiaheight;
+				pinlu_f1 = 1.0/zhouqi_T1;
+			    break;
+			case 'jiegouleixing_B':
+			    zhouqi_T1 = 0.007*zhijiaheight;
+				pinlu_f1 = 1.0/zhouqi_T1;
+			    break;
+			default:
+			    alert('请选择有效的结构类型');
+			    return;
+		}
+
+		//计算系数x1
+		switch (option_2) {
+		    case '1.28':
+				xishu_kw = 1.28;
+				xishu_x1 = 30*pinlu_f1/Math.sqrt(xishu_kw*diqu_jibenfy);
+			    break;
+			case '1.00':
+				xishu_kw = 1.0;
+				xishu_x1 = 30*pinlu_f1/Math.sqrt(xishu_kw*diqu_jibenfy);
+			    break;
+			case '0.54':
+				xishu_kw = 0.54;
+				xishu_x1 = 30*pinlu_f1/Math.sqrt(xishu_kw*diqu_jibenfy);
+			    break;
+			case '0.26':
+				xishu_kw = 0.26;
+				xishu_x1 = 30*pinlu_f1/Math.sqrt(xishu_kw*diqu_jibenfy);
+			    break;					
+			default:
+			    alert('请选择有效的场地类型');
+			    return;
+		}
+		let qianxiang;
+		let houxiang;
+		//计算脉动风荷载的共振分量因子 R
+		switch (option_3) {
+		    case '0.01':
+				zunibi = 0.01;
+				qianxiang = Math.PI/(6.0*zunibi);
+				houxiang = xishu_x1**2/(1+xishu_x1**2)**(4/3);
+				gzflR = Math.sqrt((Math.PI / (6.0 * zunibi)) * (xishu_x1 ** 2 / (1 + xishu_x1 ** 2) ** (4 / 3)));
+			    break;
+			case '0.02':
+				zunibi = 0.02;
+				gzflR = Math.sqrt((Math.PI / (6.0 * zunibi)) * (xishu_x1 ** 2 / (1 + xishu_x1 ** 2) ** (4 / 3)));
+			    break;
+			case '0.05':
+				zunibi = 0.05;
+				gzflR = Math.sqrt((Math.PI / (6.0 * zunibi)) * (xishu_x1 ** 2 / (1 + xishu_x1 ** 2) ** (4 / 3)));
+			    break;				
+			default:
+			    alert('请选择有效的结构阻尼比');
+			    return;
+		}		
+		// console.log("共振分量因子 R:", gzflR);
+		//结构基本自振周期
+		document.getElementById('result_zizhenzhouqi').value = zhouqi_T1.toFixed(3);
+		//结构第1阶自振频率
+		document.getElementById('result_zizhenpinlv').value = pinlu_f1.toFixed(3);
+		//系数x1
+		document.getElementById('result_xishux1').value = xishu_x1.toFixed(3);
+		//脉动风荷载的共振分量因子
+		document.getElementById('result_gzflR').value = gzflR.toFixed(3);
+	  }
+
+	}
+	function calculatebjfl_Bz(){
+		//读取模板支架高度
+		if (window.opener && !window.opener.closed) {
+		//获取母页面数据	
+		const zhijiaheight = parseFloat(window.opener.document.getElementById('zhijia_H').value);  //获得母页面结构高度
+		const zhijia_yfb = parseFloat(window.opener.document.getElementById('zhijia_yfb').value);  //获得迎风面宽度
+		const zhijia_cfb = parseFloat(window.opener.document.getElementById('zhijia_cfb').value);  //获得侧风面宽度		
+		const option_1 = window.opener.document.getElementById('option_changdi').value;  //获得场地类型
+		const muz_result = parseFloat(window.opener.document.getElementById('muz_result').innerText);  //获得风压高度变化系数
+		// console.log("从母页面获取的值是:", muz_result);
+		// console.log("类型:", typeof muz_result);
+		//获得本页面数据
+		
+		const jiegouzhenxing_1 = document.getElementById('jiegouzhenxing_1').value;
+		// 检查输入是否有效
+		if (isNaN(zhijiaheight) || isNaN(zhijia_yfb)  || isNaN(zhijia_cfb)  || isNaN(jiegouzhenxing_1)  || isNaN(muz_result)) {
+			alert('请输入有效的数值');
+			return;
+		}
+		// 根据选择的场地情况进行不同的计算
+		let xishurou_x;
+		let xishurou_z;
+		let xishu_k;
+		let xishu_a1;
+		let bjfl_Bz;
+		//计算相关参数
+			xishurou_z = 10.0 * Math.sqrt(zhijiaheight + 60.0 * Math.exp((-1.0 * zhijiaheight/60.0)) - 60.0) / zhijiaheight;			
+			
+			if (zhijia_yfb <= 2 * zhijiaheight){
+				xishurou_x = 10.0 * Math.sqrt(zhijia_yfb + 50.0 * Math.exp((-1.0 * zhijia_yfb/50.0)) - 50.0) / zhijia_yfb;
+			}else{
+				xishurou_x = 1.0;
+			}
+			
+		// 计算脉动风荷载的背景分量因子 Bz
+		// 按高耸结构计算背景分量Bz
+		switch (option_1) {
+			case 'changdi_A':
+				xishu_k = 1.276;
+				xishu_a1 = 0.186;
+				bjfl_Bz = xishu_k * (zhijiaheight**xishu_a1) * xishurou_x * xishurou_z * jiegouzhenxing_1 / muz_result;				
+				break;
+			case 'changdi_B':
+				xishu_k = 0.910;
+				xishu_a1 = 0.218;
+				bjfl_Bz = xishu_k * (zhijiaheight**xishu_a1) * xishurou_x * xishurou_z * jiegouzhenxing_1 / muz_result;	
+				break;
+			case 'changdi_C':
+				xishu_k = 0.404;
+				xishu_a1 = 0.292;
+				bjfl_Bz = xishu_k * (zhijiaheight**xishu_a1) * xishurou_x * xishurou_z * jiegouzhenxing_1 / muz_result;	
+				break;
+			case 'changdi_D':
+				xishu_k = 0.155;
+				xishu_a1 = 0.376;
+				bjfl_Bz = xishu_k * (zhijiaheight**xishu_a1) * xishurou_x * xishurou_z * jiegouzhenxing_1 / muz_result;	
+				break;
+			default:
+				alert('请选择有效的场地类型');
+				return;
+		}		
+		//输出脉动风荷载的背景分量因子 Bz		
+		document.getElementById('result_bjfl_Bz').value = bjfl_Bz.toFixed(3);		
+	  }
+		
+	}  
+	function calculate_fengzh_betaz(){
+		// 调用先计算项
+		calculategzflyzR();
+		calculatebjfl_Bz();
+		// 获取本页面内计算参数
+		const fzyz_g = parseFloat(document.getElementById('fzyz_g').value);
+		const option_I10 = document.getElementById('option_I10').value;
+		const result_bjfl_Bz = parseFloat(document.getElementById('result_bjfl_Bz').value);
+		const result_gzflR = parseFloat(document.getElementById('result_gzflR').value);
+		//计算顺风向风振系数
+		let xishu_I10;
+		let fengzh_betaz;
+		switch (option_I10) {
+		    case '0.12':
+				xishu_I10 = 0.12;
+				fengzh_betaz = 1.0 + 2.0 * fzyz_g * xishu_I10 * result_bjfl_Bz * Math.sqrt(1.0 + Math.pow(result_gzflR, 2));
+			    break;
+			case '0.14':
+				xishu_I10 = 0.14;
+				fengzh_betaz =  1.0 + 2.0 * fzyz_g * xishu_I10 * result_bjfl_Bz * Math.sqrt(1.0 + Math.pow(result_gzflR, 2));
+			    break;
+			case '0.23':
+				xishu_I10 = 0.23;
+				fengzh_betaz = 1.0 + 2.0 * fzyz_g * xishu_I10 * result_bjfl_Bz * Math.sqrt(1.0 + result_gzflR**2);
+			    break;
+			case '0.39':
+				xishu_I10 = 0.39;
+				fengzh_betaz = 1.0 + 2.0 * fzyz_g * xishu_I10 * result_bjfl_Bz * Math.sqrt(1.0 + result_gzflR**2);
+			    break;					
+			default:
+			    alert('请选择有效的湍流强度');
+			    return;
+		}
+		//获取母页面相关参数
+		if (window.opener && !window.opener.closed) {
+			//获结构基本参数数据
+			const zhijiaheight = parseFloat(window.opener.document.getElementById('zhijia_H').value);  //获得母页面结构高度
+			const zhijia_yfb = parseFloat(window.opener.document.getElementById('zhijia_yfb').value);  //获得迎风面宽度
+			const zhijia_cfb = parseFloat(window.opener.document.getElementById('zhijia_cfb').value);  //获得侧风面宽度		
+			
+			let gaokuanbi_yf;
+			let gaokuanbi_cf;
+			let zizhen_T1;
+			let gaokuanbi;
+			gaokuanbi_yf = zhijiaheight / zhijia_yfb;
+			gaokuanbi_cf = zhijiaheight / zhijia_cfb;
+			gaokuanbi = Math.min(gaokuanbi_yf,gaokuanbi_cf);
+			zizhen_T1 = 0.01 * zhijiaheight
+			if ((zhijiaheight > 30.0 && gaokuanbi > 1.5) || (zizhen_T1 > 0.25)) {
+				document.getElementById('result_fengzh_betaz').value = fengzh_betaz.toFixed(3);
+			} else{
+				fengzh_betaz = 1.0;
+				document.getElementById('result_fengzh_betaz').value = fengzh_betaz;
+			}	
+			// 将计算结果传回父页面
+			window.opener.receiveResult(fengzh_betaz);
+		}
+	
+	}  
+	// 返回上一层页面
+	function colse_childwin(){
+		  // 关闭当前子窗口，返回母窗口
+		  window.close();		  
+	}
+	
+    function calculateAndClose() {
+      const a = parseFloat(document.getElementById('num1').value);
+      const b = parseFloat(document.getElementById('num2').value);
+
+      if (isNaN(a) || isNaN(b)) {
+        alert('请输入有效的数字！');
+        return;
+      }
+
+      const result = a + b; // 示例：简单相加
+      alert('计算结果为：' + result);
+
+      // 【可选】将结果传回母窗口
+      if (window.opener && !window.opener.closed) {
+        // 假设母窗口有一个函数 receiveResult(result)
+        // window.opener.receiveResult(result);
+        
+        // 或者直接设置母窗口的某个元素值（需母窗口配合）
+        // 例如：window.opener.document.getElementById('result').innerText = result;
+      }
+
+      // 关闭当前子窗口，返回母窗口
+      window.close();
+    }
+  </script>
+  <script src="./js/customfun.js"></script>
+</body>
+</html>
